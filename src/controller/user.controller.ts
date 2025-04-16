@@ -276,5 +276,34 @@ export async function personalPostsController(c: Context) {
 }
 
 export const meController = async (c: Context) => {
-    return c.json({message: 'auth passed'}, STATUS_CODE.Success)
+    return c.json({ message: 'auth passed' }, STATUS_CODE.Success)
+}
+
+export const deletePostController = async (c: Context) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+    try {
+        const post = await prisma.post.findFirst({
+            where: {
+                id: c.req.param('id')
+            }
+        })
+        if (!post || post.authorId !== c.get("userId")) {
+            return c.json({
+                message: "Post not found",
+            }, STATUS_CODE.NotFount)
+        }
+        await prisma.post.delete({
+            where: {
+                id: c.req.param('id'),
+                authorId: c.get("userId")
+            }
+        })
+        return c.json({
+            message: 'Post deleted Successfully',
+        }, STATUS_CODE.Success)
+    } catch (e) {
+        return c.json({ message: 'We are unable to process your request' }, STATUS_CODE.ServerError)
+    }
 }

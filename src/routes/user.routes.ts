@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { userSigninController, userSignupController, createPostController, updatePostController, allPostsController, specificPostController, personalPostsController, meController } from '../controller/user.controller';
+import { userSigninController, userSignupController, createPostController, updatePostController, allPostsController, specificPostController, personalPostsController, meController, deletePostController } from '../controller/user.controller';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 export const userRoutes = new Hono(); 
@@ -19,3 +19,5 @@ userRoutes.get('/blog/bulk', authMiddleware, allPostsController)
 userRoutes.get('/blog/myBlogs', authMiddleware, personalPostsController)
 
 userRoutes.get('/blog/:id', authMiddleware, specificPostController)
+
+userRoutes.delete('/blog/:id', authMiddleware, deletePostController)
